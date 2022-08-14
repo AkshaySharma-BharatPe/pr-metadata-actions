@@ -1,5 +1,8 @@
+name: Get Branch Name
 on: [pull_request]
-...
+jobs:
+  build: 
+    runs-on: ubuntu-latest
     steps:
       - name: Get branch names
         id: branch-name
