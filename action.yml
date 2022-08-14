@@ -10,9 +10,6 @@ inputs:
   pr_number:
     description: 'The number of the pull request'
     required: true
-  info:
-    description: 'The number of the repo info'
-    required: true
   token:
     description: 'The token to use to access the GitHub API'
     required: true
