@@ -8,11 +8,13 @@ const main = async () => {
         const pr_number = core.getInput('pr_number', { required: true });
         const token = core.getInput('token', { required: true });
 
+        console.log(`Hello ${owner}!`);
+
         console.log(owner, repo, pr_number, token);
 
         const octokit = new github.getOctokit(token);
 
-        console.log('octokit', octokit);
+        console.log(`Hello ${octokit}!`);
 
         const { data: changedFiles } = await octokit.rest.pulls.listFiles({
             owner,
