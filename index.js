@@ -7,8 +7,13 @@ const main = async () => {
         const repo = core.getInput('repo', { required: true });
         const pr_number = core.getInput('pr_number', { required: true });
         const token = core.getInput('token', { required: true });
+        const info = core.getInput('info', { required: true });
+
+        console.log(owner, repo, pr_number, token, info);
 
         const octokit = new github.getOctokit(token);
+
+        console.log('octokit', octokit);
 
         const { data: changedFiles } = await octokit.rest.pulls.listFiles({
             owner,
