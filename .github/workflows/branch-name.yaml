@@ -1,0 +1,24 @@
+name: Get Branch Name
+on: [pull_request]
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch names
+        id: branch-name
+        uses: tj-actions/branch-names@v5.4
+
+      - name: Get Head Ref branch name (i.e The current pull request branch)
+        run: |
+          echo "${{ steps.branch-name.outputs.head_ref_branch }}"
+        # Outputs: "feature/test" current PR branch.
+
+      - name: Get Base Ref branch name (i.e The target of a pull request.)
+        run: |
+          echo "${{ steps.branch-name.outputs.base_ref_branch }}"
+        # Outputs: "main".
+      
+      - name: Default branch name
+        run: |
+          echo "${{ steps.branch-name.outputs.default_branch }}"
+        # Outputs: "main" the default branch.
