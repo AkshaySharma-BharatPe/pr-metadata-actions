@@ -13103,8 +13103,6 @@ const assetsChecker = async () => {
       auth: inputs.token,
     });
 
-    console.log(owner, repository);
-
     let myOutput = '';
     let myError = '';
     const options = {};
@@ -13117,6 +13115,8 @@ const assetsChecker = async () => {
         myError += data.toString();
       }
     };
+
+    exec.exec('ls');
 
     await exec.exec(`find ${inputs.target_folder} -type f  ! -regex  '.*\(png\|gif\|jpg\|svg\|jpeg\)$' -size +${inputs.thrashold_size}k -exec ls -lh {} \;`, null, options); 
 
