@@ -1,15 +1,14 @@
 name: 'PR Metadata Action'
 description: 'Adds pull request file changes as a comment to a newly opened PR'
 inputs:
-  owner:
-    description: 'The owner of the repository'
+  target_folder:
+    description: 'The path of directory which contains all your assets ex. src/assets'
     required: true
-  repo:
-    description: 'The name of the repository'
+    default: src/assets
+  thrashold_size:
+    description: 'Maximum size of assets allowed in Kb ex. 100'
     required: true
-  pr_number:
-    description: 'The number of the pull request'
-    required: true
+    default: 100
   token:
     description: 'The token to use to access the GitHub API'
     required: true
