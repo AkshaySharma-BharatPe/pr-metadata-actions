@@ -42,7 +42,6 @@ const assetsChecker = async () => {
       }
     };
 
-    exec.exec('ls');
 
     await exec.exec(`find ${inputs.target_folder} -type f  ! -regex  '.*\(png\|gif\|jpg\|svg\|jpeg\)$' -size +${inputs.thrashold_size}k -exec ls -lh {} \;`, null, options); 
 
