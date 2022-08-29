@@ -75,4 +75,4 @@ const assetsChecker = async () => {
   }
 };
 
-export default assetsChecker;
+assetsChecker();

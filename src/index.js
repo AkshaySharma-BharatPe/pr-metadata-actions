@@ -1,10 +1,10 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const { default: assetsChecker } = require('./asset-checker');
+const exec = require("@actions/exec");
 
 const main = async () => {
     try {
-      await assetsChecker();
+      await exec.exec(`node ./asset-checker.js`);
     }catch (error) {
         core.setFailed(error.message);
     }
