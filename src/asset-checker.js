@@ -29,6 +29,7 @@ const assetsChecker = async () => {
       auth: inputs.token,
     });
 
+    console.log(owner, repository);
 
     let myOutput = '';
     let myError = '';
