@@ -9487,6 +9487,110 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 6174:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const core = __nccwpck_require__(5127);
+const github = __nccwpck_require__(3134);
+const exec = __nccwpck_require__(6946);
+const { Octokit } = __nccwpck_require__(5318);
+
+const assetsChecker = async () => {
+  try {
+
+    const inputs = {
+      token: core.getInput("token"),
+      target_folder: core.getInput("target_folder"),
+      thrashold_size: core.getInput("thrashold_size")
+    };
+
+    const {
+      payload: { pull_request: pullRequest, repository },
+    } = github.context;
+
+    if (!pullRequest) {
+      core.error("This action only works on pull_request events");
+      return;
+    }
+
+    const { number: issueNumber } = pullRequest;
+    const { full_name: repoFullName } = repository;
+    const [owner, repo] = repoFullName.split("/");
+
+    const octokit = new Octokit({
+      auth: inputs.token,
+    });
+
+
+    let myOutput = '';
+    let myError = '';
+    const options = {};
+
+    options.listeners = {
+      stdout: (data) => {
+        myOutput += data.toString();
+      },
+      stderr: (data) => {
+        myError += data.toString();
+      }
+    };
+
+    await exec.exec(`find ${inputs.target_folder} -type f  ! -regex  '.*\(png\|gif\|jpg\|svg\|jpeg\)$' -size +${inputs.thrashold_size}k -exec ls -lh {} \;`, null, options); 
+
+    const arrayOutput = myOutput.split("\n");
+    const count = arrayOutput.length -1;
+
+    const successBody = ` Woohooo :rocket: !!! Congratulations, your all assets are less than ${inputs.thrashold_size}Kb.`
+    const errorBody = `Oops :eyes: !!! You have ${count} assets with size more than ${inputs.thrashold_size}Kb. Please optimize them.`
+
+
+    if(count > 0) {
+      octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: issueNumber,
+        body: errorBody,
+      });
+      core.setFailed('Invalid size assets exists !!!');
+    }else {
+      octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: issueNumber,
+        body: successBody,
+      });
+    }
+
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (assetsChecker);
+
+/***/ }),
+
+/***/ 6946:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/exec");
+
+
+/***/ }),
+
+/***/ 5318:
+/***/ ((module) => {
+
+module.exports = eval("require")("@octokit/rest");
+
+
+/***/ }),
+
 /***/ 2431:
 /***/ ((module) => {
 
@@ -9656,6 +9760,34 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -9666,90 +9798,17 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(5127);
 const github = __nccwpck_require__(3134);
+const { default: assetsChecker } = __nccwpck_require__(6174);
 
 const main = async () => {
     try {
-        const owner = core.getInput('owner', { required: true });
-        const repo = core.getInput('repo', { required: true });
-        const pr_number = core.getInput('pr_number', { required: true });
-        const token = core.getInput('token', { required: true });
-
-        const octokit = new github.getOctokit(token);
-
-        const { data: changedFiles } = await octokit.rest.pulls.listFiles({
-            owner,
-            repo,
-            pull_number: pr_number,
-          });
-      
-        let diffData = {
-            additions: 0,
-            deletions: 0,
-            changes: 0
-        };
-      
-        diffData = changedFiles.reduce((acc, file) => {
-            acc.additions += file.additions;
-            acc.deletions += file.deletions;
-            acc.changes += file.changes;
-            return acc;
-          }, diffData);
-
-          for (const file of changedFiles) {
-            /**
-             * Add labels according to file types.
-             */
-            const fileExtension = file.filename.split('.').pop();
-            switch(fileExtension) {
-              case 'md':
-                await octokit.rest.issues.addLabels({
-                  owner,
-                  repo,
-                  issue_number: pr_number,
-                  labels: ['markdown'],
-                });
-              case 'js':
-                await octokit.rest.issues.addLabels({
-                  owner,
-                  repo,
-                  issue_number: pr_number,
-                  labels: ['javascript'],
-                });
-                case 'yml':
-                    await octokit.rest.issues.addLabels({
-                      owner,
-                      repo,
-                      issue_number: pr_number,
-                      labels: ['yaml'],
-                    });
-                  case 'yaml':
-                    await octokit.rest.issues.addLabels({
-                      owner,
-                      repo,
-                      issue_number: pr_number,
-                      labels: ['yaml'],
-                    });
-                }
-              }
-
-              await octokit.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pr_number,
-                body: `
-                  Pull Request #${pr_number} has been updated with: \n
-                  - ${diffData.changes} changes \n
-                  - ${diffData.additions} additions \n
-                  - ${diffData.deletions} deletions \n
-                `
-              });
+      await assetsChecker();
     }catch (error) {
         core.setFailed(error.message);
     }
 }
 
 main();
-
 
 })();
 
