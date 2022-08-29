@@ -13265,6 +13265,20 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+// const core = require('@actions/core');
+// const github = require('@actions/github');
+// const exec = require("@actions/exec");
+
+// const main = async () => {
+//     try {
+//       await exec.exec(`node ./asset-checker.js`);
+//     }catch (error) {
+//         core.setFailed(error.message);
+//     }
+// }
+
+// main();
+
 const core = __nccwpck_require__(5127);
 const github = __nccwpck_require__(3134);
 const exec = __nccwpck_require__(2049);
